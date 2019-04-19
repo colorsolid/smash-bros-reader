@@ -1,0 +1,28 @@
+1. - First screen - (lobby):
+	Number of players
+	Teams
+	Country
+
+2. - Second screen (lobby):
+	Character
+	Player names (Japanese, possibly other types of characters)
+	GSP
+
+3. - Second screen (lobby, same as 2 after brief delay):
+	Map
+	Game mode
+
+4. - Pregame countdown
+	Game default length
+	? Song playing
+
+5a. - Fight! - Constant Update
+	Game timer
+	modes:
+		Stock:
+			Stock count
+		Time:
+			Score (+1 and -1 replacing damage)
+	Damage (weight betting live)
+	Game end
+	Victor

@@ -1,3 +1,6 @@
-frames/**
-flags/**
+smash_reader/frames/**
+smash_reader/flags/**
+smash_reader/screens/**
+smash_reader/captures/**
+env/**
 *.mp4
