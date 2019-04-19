@@ -53,7 +53,7 @@ def save_frames(vid_path, framerate=None):
 
 def capture_screen():
     with mss.mss() as sct:
-        monitor = sct.monitors[2]
+        monitor = sct.monitors[1]
         sct_img = sct.grab(monitor)
         pil_img = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
         return pil_img
