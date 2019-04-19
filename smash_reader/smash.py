@@ -69,6 +69,7 @@ class Watcher:
 
 
     def main(self):
+        print(f'Waiting for flag screen...')
         list_limit = 3
         sim_list = [0] * list_limit
         while True:

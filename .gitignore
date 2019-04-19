@@ -1,1 +1,7 @@
-env/**
+**/env
+**/frames
+**/flags
+**/screens
+**/captures
+*.mp4
+**/__pycache__
