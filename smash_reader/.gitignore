@@ -1,0 +1,6 @@
+frames/**
+flags/**
+screens/**
+captures/**
+*.mp4
+*.pb
