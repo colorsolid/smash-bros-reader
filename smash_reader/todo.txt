@@ -1,0 +1,6 @@
+Finish victory screen detection
+Make stock reading live
+Add time mode score detection
+HP mode
+Detect guest players and split number on card screen
+Hash player names

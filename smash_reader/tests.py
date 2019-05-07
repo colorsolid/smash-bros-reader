@@ -1,9 +1,14 @@
 import argparse
 import cv2
+import difflib
+import matplotlib.pyplot as plt
 import mss
 import numpy as np
 import os
+import re
 import select
+import smash_game
+import smash_utility as ut
 import socket
 import struct
 import threading
@@ -14,7 +19,89 @@ from queue import Empty, Queue
 from PIL import Image, ImageChops, ImageDraw, ImageGrab
 
 
-home = os.path.dirname(os.path.realpath(__file__))
+BASE_DIR = os.path.realpath(os.path.dirname(__file__))
+CAPTURES_DIR = os.path.join(BASE_DIR, 'captures')
+if not os.path.isdir(CAPTURES_DIR):
+    os.mkdir(CAPTURES_DIR)
+
+
+def fight_tester():
+    captures = os.listdir(CAPTURES_DIR)
+    get_fight_num = lambda f: re.match('\d+', f).group()
+    fight_nums = list({get_fight_num(f) for f in captures})
+    fight_nums.sort(key=lambda n: int(n))
+    # n = fight_nums[int(random.random() * len(fight_nums))]
+    # n = '0001'
+    modes = {}
+    for i, n in enumerate(fight_nums[16:]):
+        print(f'{"*" * 80}\n{n}')
+        card_screen = Image.open(os.path.join(CAPTURES_DIR, n + '.2.LOBBY_CARDS.png'))
+        fight_start_screen = Image.open(os.path.join(CAPTURES_DIR, n + '.3.FIGHT_START.png'))
+        # fight_end_screen = Image.open(os.path.join(CAPTURES_DIR, n + '.4.FIGHT_END.png'))
+        # try:
+        #     fight_results_screen = Image.open(os.path.join(CAPTURES_DIR, n + '.5.FIGHT_RESULTS_SOLO.png'))
+        # except FileNotFoundError:
+        #     fight_results_screen = Image.open(os.path.join(CAPTURES_DIR, n + '.5.FIGHT_RESULTS_TEAM.png'))
+
+
+        game = smash_game.Game(1)
+        game.read_card_screen(card_screen)
+        if game.mode in modes:
+            modes[game.mode].append(i)
+        else:
+            modes[game.mode] = [i]
+        break
+    for mode in modes:
+        print(f'{mode}: {modes[mode]}')
+        game.read_start_screen(fight_start_screen)
+        print(game.serialize(images_bool=False))
+        # game.fix_colors(fight_start_screen)
+        # game.read_end_screen(fight_end_screen)
+        # game.read_results_screen(fight_results_screen)
+        # print(str(game))
+        # with open('game.json', 'w+') as outfile:
+        #    json.dump(game.serialize(), outfile, separators=(',',':'))
+
+
+def crop_char_lobby():
+    cap = ut.capture_screen()
+    game = smash_game.Game(1)
+    game.player_count = 4
+    game.read_cards(cap)
+
+
+def crop_char_game():
+    cap = ut.capture_screen()
+    game = smash_game.Game(1)
+    game.player_count = 3
+    name_images = game.get_character_name_game(cap)
+    for img in name_images:
+        bw, _ = ut.convert_to_bw(img)
+        name_as_read = ut.read_image(bw).lower()
+        name = difflib.get_close_matches(name_as_read, smash_game.CHARACTER_NAMES, n=1)
+        print(name)
+
+
+
+def filter():
+    plt.ion()
+    while True:
+        cap = ut.capture_screen()
+        img = ut.filter_color(cap, [236, 236, 236])
+        plt.imshow(img)
+        plt.pause(0.001)
+        plt.show()
+
+
+def cropper(coord_name, name=None):
+    coords = ut.COORDS['FINAL'][coord_name]
+    capture = ut.capture_screen()
+    crop = capture.crop(coords)
+    if name:
+        crop.save(f'{name}.png')
+    else:
+        return np.asarray(crop)
+        # crop.show()
 
 
 def capture_screen():
@@ -274,4 +361,6 @@ def ocr_test():
 
 
 if __name__ == '__main__':
-    ocr_test()
+    #ocr_test()
+    fight_tester()
+    pass
