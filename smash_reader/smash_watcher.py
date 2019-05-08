@@ -4,12 +4,10 @@ from   queue import Empty
 import re
 import smash_game
 import smash_utility as ut
-import sys
 import threading
 import time
 
 
-sys.excepthook = ut.log_exception
 output = True
 def _print(*args, **kwargs):
     if output:
@@ -97,7 +95,7 @@ class Watcher(threading.Thread):
 
 
     # @ut.pad_time(0.20)
-    def check_screen_basic(self, crash):
+    def check_screen_basic(self):
         screen, area = self.id_coords[self.current_type_index]
         coords = ut.COORDS[screen][area]
         if (screen, area) == ('FINAL', 'ID'):
