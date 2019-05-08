@@ -253,10 +253,6 @@ class Window(tk.Frame):
         self.queue = Queue()
         self.watcher_queue = Queue()
 
-        key_capture = smash_watcher.KeyThread(ut.capture_cards_id)
-        key_capture.daemon = True
-        key_capture.start()
-
         self.watcher = smash_watcher.Watcher(self.watcher_queue, self.queue)
         self.watcher.daemon = True
 

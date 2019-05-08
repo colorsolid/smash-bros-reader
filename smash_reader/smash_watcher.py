@@ -193,22 +193,3 @@ class Watcher(threading.Thread):
             self.current_type_index = 0
         _print(f'Mode changed to {self.current_type_index}')
         # _print(json.dumps(self.game.serialize(), separators=(',', ': ')))
-
-
-class KeyThread(threading.Thread):
-    def __init__(self, callback, *args, **kwargs):
-        super().__init__()
-
-        self.callback = callback
-
-        self.key = keyboard.KeyCode(char='g')
-
-
-    def run(self):
-        with keyboard.Listener(on_press=self.on_press) as listener:
-            listener.join()
-
-
-    def on_press(self, key):
-        if key == self.key:
-            self.callback()
