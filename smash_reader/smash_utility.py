@@ -176,9 +176,9 @@ def capture_cards_id():
 
 def read_image(image, config_type='basic'):
     configs = {
-        'basic': '-psm 6 --oem 3',
-        'gsp': '-psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,',
-        'player_number': '-psm 8 --oem 3 -c tessedit_char_whitelist=p1234'
+        'basic': '--psm 6 --oem 3',
+        'gsp': '--psm 8 --oem 3 -c tessedit_char_whitelist=0123456789,',
+        'player_number': '--psm 8 --oem 3 -c tessedit_char_whitelist=p1234'
     }
     text = pytesseract.image_to_string(image, config=configs[config_type])
     return text
