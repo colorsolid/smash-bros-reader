@@ -135,8 +135,8 @@ def pad_time(interval):
 
 
 def save_frames(vid_path, framerate=None):
-    print('saving template in 3 seconds')
-    time.sleep(3)
+    print('saving template in 5 seconds')
+    time.sleep(5)
     vid_cap = cv2.VideoCapture(vid_path)
     success = True
     frame_index = 0
@@ -161,7 +161,8 @@ def capture_cards_id():
     coords = COORDS['LOBBY']['CARDS_ID']
     cap = capture_screen()
     crop = cap.crop(coords)
-    del TEMPLATES['LOBBY']['CARDS_ID']
+    if 'CARDS_ID' in TEMPLATES['LOBBY']:
+        del TEMPLATES['LOBBY']['CARDS_ID']
     crop.save(os.path.join(TEMPLATES_DIR, 'lobby', 'CARDS_ID.png'))
     TEMPLATES['LOBBY']['CARDS_ID'] = crop
 
