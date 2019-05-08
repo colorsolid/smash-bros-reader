@@ -1,6 +1,5 @@
 import json
 import os
-from   pynput import keyboard
 from   queue import Empty
 import re
 import smash_game

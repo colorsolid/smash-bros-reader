@@ -15,7 +15,6 @@ pytesseract==0.2.6
 python-dateutil==2.8.0
 pytz==2018.9
 PyWavelets==1.0.3
-pywin32==224
 scikit-image==0.15.0
 scipy==1.2.1
 six==1.12.0

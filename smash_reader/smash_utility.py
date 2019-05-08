@@ -135,6 +135,8 @@ def pad_time(interval):
 
 
 def save_frames(vid_path, framerate=None):
+    print('saving template in 3 seconds')
+    time.sleep(3)
     vid_cap = cv2.VideoCapture(vid_path)
     success = True
     frame_index = 0
@@ -147,7 +149,7 @@ def save_frames(vid_path, framerate=None):
 
 
 # @time_this
-def capture_screen(monitor_index=2):
+def capture_screen(monitor_index=1):
     with mss.mss() as sct:
         monitor = sct.monitors[monitor_index]
         sct_img = sct.grab(monitor)
