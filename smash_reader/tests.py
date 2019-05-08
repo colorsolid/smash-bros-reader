@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import mss
 import numpy as np
 import os
+from   pynput import keyboard
 import re
 import select
 import smash_game
@@ -23,6 +24,30 @@ BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 CAPTURES_DIR = os.path.join(BASE_DIR, 'captures')
 if not os.path.isdir(CAPTURES_DIR):
     os.mkdir(CAPTURES_DIR)
+
+
+class KeyThread(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+        self.key = keyboard.KeyCode(char='g')
+
+
+    def run(self):
+        with keyboard.Listener(on_press=self.on_press) as listener:
+            listener.join()
+
+
+    def on_press(self, key):
+        if key == self.key:
+            print('test')
+
+
+def start_key_thread():
+    thread = KeyThread()
+    thread.daemon = True
+    thread.start()
+
 
 
 def fight_tester():

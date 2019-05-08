@@ -253,6 +253,10 @@ class Window(tk.Frame):
         self.queue = Queue()
         self.watcher_queue = Queue()
 
+        key_capture = smash_watcher.KeyThread(ut.capture_cards_id)
+        key_capture.daemon = True
+        key_capture.start()
+
         self.watcher = smash_watcher.Watcher(self.watcher_queue, self.queue)
         self.watcher.daemon = True
 
@@ -274,6 +278,8 @@ class Window(tk.Frame):
 
         self.menubar = Menubar(self)
         self.master.config(menu=self.menubar)
+
+        self.master.bind('g', lambda e: print('test'))
 
         self.loop()
 
@@ -322,6 +328,7 @@ def run_gui():
 
 
 def headless():
+
     queue = Queue()
     watcher_queue = Queue()
     watcher = smash_watcher.Watcher(watcher_queue, queue)
@@ -330,6 +337,8 @@ def headless():
     _input = ''
     while _input not in ['stop', 'exit', 'quit']:
         _input = input('>: ')
+    key_capture.put('quit')
+    key_capture.join()
     watcher_queue.put('quit')
     watcher.join()
 

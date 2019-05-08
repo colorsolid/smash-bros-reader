@@ -147,7 +147,7 @@ def save_frames(vid_path, framerate=None):
 
 
 # @time_this
-def capture_screen(monitor_index=1):
+def capture_screen(monitor_index=2):
     with mss.mss() as sct:
         monitor = sct.monitors[monitor_index]
         sct_img = sct.grab(monitor)
