@@ -147,12 +147,21 @@ def save_frames(vid_path, framerate=None):
 
 
 # @time_this
-def capture_screen(monitor_index=2):
+def capture_screen(monitor_index=1):
     with mss.mss() as sct:
         monitor = sct.monitors[monitor_index]
         sct_img = sct.grab(monitor)
         pil_img = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
         return pil_img
+
+
+def capture_cards_id():
+    coords = COORDS['LOBBY']['CARDS_ID']
+    cap = capture_screen()
+    crop = cap.crop(coords)
+    del TEMPLATES['LOBBY']['CARDS_ID']
+    crop.save(os.path.join(TEMPLATES_DIR, 'lobby', 'CARDS_ID.png'))
+    TEMPLATES['LOBBY']['CARDS_ID'] = crop
 
 
 

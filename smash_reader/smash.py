@@ -55,6 +55,8 @@ class Menubar(tk.Menu):
         self.debug_menu.add_cascade(label='Outputs', menu=self.output_menu)
         self.debug_menu.add_separator()
         self.debug_menu.add_command(label='Print game data', command=lambda: print(self.master.game))
+        self.debug_menu.add_separator()
+        self.debug_menu.add_command(label='Capture cards_id template', command=ut.capture_cards_id)
 
         self.add_cascade(label='File', menu=self.file_menu)
         self.add_cascade(label='Debug', menu=self.debug_menu)
@@ -330,6 +332,7 @@ def headless():
         _input = input('>: ')
     watcher_queue.put('quit')
     watcher.join()
+
 
 if __name__ == '__main__':
     print(f'\n\n{"*" * 40} {TITLE} {"*" * 40}')
