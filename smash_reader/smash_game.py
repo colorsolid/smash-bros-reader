@@ -157,6 +157,7 @@ class Game:
         self.start_time = 0
         self.duration = 0
         self.cancelled = False
+        self.colors_correct = False
 
 
     def serialize(self, images_bool=True):
@@ -196,6 +197,7 @@ class Game:
         skip = 0
         id_pixels = [p for row in id_arr for p in row]
         color_pixels = [p for row in color_arr for p in row]
+        players = []
         for i, id_pixel in enumerate(id_pixels):
             if skip:
                 skip -= 1
@@ -208,6 +210,11 @@ class Game:
 
                 player = Player()
                 player.read_card(crop)
+                if player.character_name == '...':
+                    _print('GAME CANCELLED DUE TO UNREADABLE CHARACTER NAME')
+                    self.cancelled = True
+                else:
+                    players.append(player.character_name)
                 self.player_count += 1
 
                 team = next((t for t in self.teams if t.color == color), None)
@@ -219,11 +226,19 @@ class Game:
                 skip = 340
         if len(self.teams) == 2 and self.player_count > 2:
             self.team_mode = True
+            self.colors_correct = True
+        if len(set(players)) < len(players):
+            _print('GAME CANCELLED DUE TO DUPLICATE CHARACTER IN FFA')
+            self.cancelled = True
+
+
+    # HERE -
 
 
     def read_start_screen(self, screen):
-        if not self.team_mode:
-            self.fix_colors(screen)
+        if not self.team_mode and not self.cancelled:
+            # self.fix_colors(screen)
+            pass
         if self.mode == 'Stock':
             self.get_stock_templates(screen)
         elif self.mode == 'Time':
@@ -289,18 +304,27 @@ class Game:
 
     def get_character_names_game(self, screen):
         names = []
-        for edge in ut.COORDS['GAME']['PLAYER']['INFO'][self.player_count]:
-            char_template_coords = list(ut.COORDS['GAME']['PLAYER']['NAME'])
-            char_template_coords[0] = edge - char_template_coords[0]
-            char_template_coords[2] = edge - char_template_coords[2]
-            template = screen.crop(char_template_coords)
-            bw, _ = ut.convert_to_bw(template)
-            name_as_read = ut.read_image(bw).lower()
-            name = difflib.get_close_matches(name_as_read, CHARACTER_NAMES, n=1)
-            if len(name):
-                names.append(name[0])
-            # template.show()
-            # template.save(f'{time.time()}.png')
+        rerun = True
+        while rerun:
+            for edge in ut.COORDS['GAME']['PLAYER']['INFO'][self.player_count]:
+                char_template_coords = list(ut.COORDS['GAME']['PLAYER']['NAME'])
+                char_template_coords[0] = edge - char_template_coords[0]
+                char_template_coords[2] = edge - char_template_coords[2]
+                template = screen.crop(char_template_coords)
+                bw, _ = ut.convert_to_bw(template)
+                name_as_read = ut.read_image(bw).lower()
+                if name_as_read:
+                    rerun = False
+                    name = difflib.get_close_matches(name_as_read, CHARACTER_NAMES, n=1)
+                    if len(name):
+                        _print(f'{name_as_read.rjust(30)} --> {name}')
+                        names.append(name[0])
+                    else:
+                        _print(f'Can\'t read <{name_as_read}>')
+                    # template.show()
+                    # template.save(f'{time.time()}.png')
+                else:
+                    _print(f'Can\'t read <{name_as_read}>')
         return names
 
 

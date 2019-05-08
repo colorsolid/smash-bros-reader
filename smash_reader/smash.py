@@ -324,7 +324,6 @@ def run_gui():
 
 
 def headless():
-
     queue = Queue()
     watcher_queue = Queue()
     watcher = smash_watcher.Watcher(watcher_queue, queue)
@@ -340,6 +339,7 @@ def headless():
 
 
 if __name__ == '__main__':
+    # sys.excepthook = ut.log_exception
     print(f'\n\n{"*" * 40} {TITLE} {"*" * 40}')
     print(f'<<<{datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")}>>>')
     if len(sys.argv):
