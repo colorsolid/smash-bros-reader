@@ -1,13 +1,17 @@
 import copy
 import difflib
 import json
+from   logger import log_exception
 import numpy as np
 import os
 from   PIL import Image
 import re
 import smash_utility as ut
+import sys
 import threading
 import time
+
+sys.excepthook = log_exception
 
 
 output = True

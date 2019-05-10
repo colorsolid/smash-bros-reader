@@ -1,5 +1,6 @@
-import datetime
+from   datetime import datetime
 import json
+from   logger import log_exception
 import numpy as np
 import os
 from   PIL import Image, ImageTk
@@ -7,9 +8,11 @@ from   queue import Queue, Empty
 import smash_game
 import smash_utility as ut
 import smash_watcher
-import sys
+from   sys import argv, excepthook
 import time
 import tkinter as tk
+
+excepthook = log_exception
 
 
 TITLE = 'SmashBet Screen Watcher'
@@ -17,9 +20,9 @@ TITLE = 'SmashBet Screen Watcher'
 
 BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 
+
 BG = ['#282C34', '#383D48']
 FG = ['#9098A6', '#9DA5B4', '#ABB3BF', '#E06C75', '#61AFEF', '#56B6C2', '#98C379']
-
 
 def config_grids(widget, rows=[], columns=[]):
     [widget.rowconfigure(i, weight=weight) for i, weight in enumerate(rows)]
@@ -43,13 +46,13 @@ class Menubar(tk.Menu):
 
         self.output_menu = tk.Menu(self, tearoff=0)
         self.output_menu.add_command(
-            label='silence Watcher', command=lambda: self.toggle_output(smash_watcher, 'Watcher', 0)
+            label='Silence watcher', command=lambda: self.toggle_output(smash_watcher, 'watcher', 0)
         )
         self.output_menu.add_command(
-            label='silence Game', command=lambda: self.toggle_output(smash_game, 'Game', 1)
+            label='Silence game', command=lambda: self.toggle_output(smash_game, 'game', 1)
         )
         self.output_menu.add_command(
-            label='silence Utility', command=lambda: self.toggle_output(ut, 'Utility', 2)
+            label='Silence utility', command=lambda: self.toggle_output(ut, 'utility', 2)
         )
 
         self.debug_menu.add_cascade(label='Outputs', menu=self.output_menu)
@@ -111,14 +114,22 @@ class PlayerFrame(tk.Frame):
             img[i] = [pixel * 255 for pixel in img[i]]
         arr = np.asarray(img)
         # arr = np.array(self.info['player_name_image'])
-        img = Image.fromarray(arr)
-        img = img.resize((200, 30), Image.NEAREST)
-        # img.show()
-        img = img.convert('1').tobitmap()
-        bitmap = ImageTk.BitmapImage(data=img)
-        self.player_name_label = tk.Label(self, image=bitmap, bg=self.master['background'])
-        self.player_name_label.image = bitmap
-        self.player_name_label.grid(row=1, column=1, sticky='nw', padx=10)
+        try:
+            img = Image.fromarray(arr)
+            img = img.resize((200, 30), Image.NEAREST)
+            # img.show()
+            img = img.convert('1').tobitmap()
+            bitmap = ImageTk.BitmapImage(data=img)
+            self.player_name_label = tk.Label(self, image=bitmap, bg=self.master['background'])
+            self.player_name_label.image = bitmap
+            self.player_name_label.grid(row=1, column=1, sticky='nw', padx=10)
+        except TypeError:
+            _print('Image data corrupted')
+            try:
+                ut.dump_image_data(arr)
+                _print('Image data successfully dumped')
+            except:
+                _print('Failed to dump image data')
 
 
 class TeamFrame(tk.Frame):
@@ -207,8 +218,8 @@ class GameFrame(tk.Frame):
         game['teams'].sort(key=lambda team: color_order.index(team['color']))
         team_frames = []
         for team_index, team in enumerate(game['teams']):
-            color_hex = ut.rgb_to_hex(ut.COLORS['CARDS'][team['color']])
-            team_frames.append(TeamFrame(self.teams_frame, team, bg=color_hex))
+            hex_color = ut.rgb_to_hex(ut.COLORS['CARDS'][team['color']])
+            team_frames.append(TeamFrame(self.teams_frame, team, bg=hex_color))
             team_frames[team_index].grid(row=team_index, column=0, sticky='nsew', pady=(0, 10))
 
 
@@ -275,8 +286,6 @@ class Window(tk.Frame):
         self.menubar = Menubar(self)
         self.master.config(menu=self.menubar)
 
-        self.master.bind('g', lambda e: print('test'))
-
         self.loop()
 
 
@@ -339,11 +348,11 @@ def headless():
 
 
 if __name__ == '__main__':
-    # sys.excepthook = ut.log_exception
     print(f'\n\n{"*" * 40} {TITLE} {"*" * 40}')
-    print(f'<<<{datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")}>>>')
-    if len(sys.argv):
-        if '-nogui' in sys.argv:
+    print(f'<<<{datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")}>>>')
+    # settings = ut.load_settings()
+    if len(argv):
+        if '-nogui' in argv:
             headless()
         else:
             run_gui()

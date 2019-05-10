@@ -1,16 +1,18 @@
 import cv2
-import datetime
 import json
+from   logger import log_exception
 import matplotlib.pyplot as plt
 import mss
 import numpy as np
 from   PIL import Image, ImageChops
 import pytesseract
 from   skimage.measure import compare_ssim
+import subprocess
 import os
 import sys
 import time
-import traceback
+
+sys.excepthook = log_exception
 
 
 output = True
@@ -20,6 +22,15 @@ def _print(*args, **kwargs):
         args.insert(0, '<Utility>')
         print(*args, **kwargs)
 
+BASE_DIR = os.path.realpath(os.path.dirname(__file__))
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
+
+override_path = os.path.join(BASE_DIR, 'index.txt')
+if os.path.isfile(override_path):
+    with open(override_path, 'r') as infile:
+        MONITOR_INDEX = int(infile.read())
+else:
+    MONITOR_INDEX = 1
 
 COORDS = {
     'LOBBY': {
@@ -75,9 +86,6 @@ COORDS = {
     }
 }
 
-BASE_DIR = os.path.realpath(os.path.dirname(__file__))
-TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
-
 folders = [f for f in os.listdir(TEMPLATES_DIR) if os.path.isdir(os.path.join(TEMPLATES_DIR, f))]
 TEMPLATES = {f.upper():{} for f in folders}
 for root, dirs, files in os.walk(TEMPLATES_DIR, topdown=False):
@@ -102,7 +110,7 @@ def time_this(func):
         end_time = time.time()
         duration = end_time - start_time
         dur_str = '{:.2f}'.format(duration)
-        _print(f'function: {func.__name__} executed in {dur_str} seconds')
+        _print(f'function: {func.__name__}() executed in {dur_str} seconds')
         return result
     return wrapper
 
@@ -149,8 +157,11 @@ def save_frames(vid_path, framerate=None):
 
 
 # @time_this
-def capture_screen(monitor_index=2):
+def capture_screen(monitor_index=MONITOR_INDEX):
     with mss.mss() as sct:
+        monitor_count = len(sct.monitors)
+        if monitor_index > monitor_count:
+            monitor_index = monitor_count
         monitor = sct.monitors[monitor_index]
         sct_img = sct.grab(monitor)
         pil_img = Image.frombytes('RGB', sct_img.size, sct_img.bgra, 'raw', 'BGRX')
@@ -325,20 +336,17 @@ def rgb_to_hex(rgb):
 #####################################################################
 
 
-def log_exception(type, value, tb):
-    error = traceback.format_exception(type, value, tb)
-    filepath = os.path.join(BASE_DIR, 'error.log')
-    old_text = '\n'
-    if os.path.isfile(filepath):
-        with open(filepath, 'r') as logfile:
-            old_text += logfile.read()
-    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    line = f'[{timestamp}]\n{("".join(error))}'
-    new_text = line + old_text
-    with open(filepath, 'w+') as logfile:
-        logfile.write(new_text)
 
-    sys.__excepthook__(type, value, tb)
+def dump_image_data(arr):
+    filepath = os.path.join(BASE_DIR, 'img_dump.json')
+    if os.path.isfile(filepath):
+        with open(filepath, 'r') as infile:
+            data = json.load(infile)
+    else:
+        data = []
+    data.append({time.time(): arr})
+    with open(filepath, 'w+') as outfile:
+        json.dump(data, outfile)
 
 
 def clear_console():
@@ -368,3 +376,32 @@ def load_game_data():
         except json.decoder.JSONDecodeError:
             pass
     return []
+
+
+def save_settings(settings):
+    print(settings)
+    path = os.path.join(BASE_DIR, 'settings.json')
+    with open(path, 'w+') as outfile:
+        json.dump(settings, outfile)
+
+
+def load_settings():
+    path = os.path.join(BASE_DIR, 'settings.json')
+    if os.path.isfile(path):
+        with open(path, 'r') as infile:
+            settings = json.load(infile)
+    else:
+        settings = {
+            'monitor_index': 1,
+            'game_output': True,
+            'watcher_output': True,
+            'utility_output': True
+        }
+        save_settings(settings)
+    return settings
+
+
+def send_command():
+    # subprocess.Popen()
+    # PIGPIO_ADDR=169.254.183.202
+    pass

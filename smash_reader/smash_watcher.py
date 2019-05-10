@@ -1,11 +1,15 @@
 import json
+from   logger import log_exception
 import os
 from   queue import Empty
 import re
 import smash_game
 import smash_utility as ut
+import sys
 import threading
 import time
+
+sys.excepthook = log_exception
 
 
 output = True
@@ -166,6 +170,8 @@ class Watcher(threading.Thread):
         if self.current_type_index == 1:
             _print('Flags cards')
             self.gui_queue.put({'status': 'Reading cards'})
+            time.sleep(1)
+            self.cap = ut.capture_screen()
             self.game.read_card_screen(self.cap)
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle pregame'})
@@ -190,6 +196,6 @@ class Watcher(threading.Thread):
             ut.save_game_data(self.game.serialize())
         self.current_type_index += 1
         if self.current_type_index >= 6:
-            self.current_type_index = 0
+            self.reset()
         _print(f'Mode changed to {self.current_type_index}')
         # _print(json.dumps(self.game.serialize(), separators=(',', ': ')))
