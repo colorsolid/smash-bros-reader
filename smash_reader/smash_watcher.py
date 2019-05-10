@@ -188,8 +188,8 @@ class Watcher(threading.Thread):
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for flag screen'})
             ut.save_game_data(self.game.serialize())
-        if self.current_type_index >= 6:
-            self.reset()
         self.current_type_index += 1
         _print(f'Mode changed to {self.current_type_index}')
+        if self.current_type_index >= 6:
+            self.reset()
         # _print(json.dumps(self.game.serialize(), separators=(',', ': ')))
