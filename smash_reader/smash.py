@@ -21,7 +21,7 @@ output = True
 def _print(*args, **kwargs):
     if output:
         args = list(args)
-        args.insert(0, '<Utility>')
+        args.insert(0, '<GUI>')
         print(*args, **kwargs)
 
 BASE_DIR = os.path.realpath(os.path.dirname(__file__))
