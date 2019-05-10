@@ -17,6 +17,12 @@ excepthook = log_exception
 
 TITLE = 'SmashBet Screen Watcher'
 
+output = True
+def _print(*args, **kwargs):
+    if output:
+        args = list(args)
+        args.insert(0, '<Utility>')
+        print(*args, **kwargs)
 
 BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 
