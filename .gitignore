@@ -5,3 +5,5 @@
 **/captures
 *.mp4
 **/__pycache__
+index.txt
+games.json

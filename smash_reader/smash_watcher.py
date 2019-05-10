@@ -56,22 +56,16 @@ class Watcher(threading.Thread):
         _print('Watching for flags')
         self.gui_queue.put({'status': 'Watching for flag screen'})
         while self.cont:
+            if self.game.cancelled:
+                self.reset()
+                self.gui_queue.put('update')
+                self.gui_queue.put({'status': 'Watching for flag screen'})
             self.cap = ut.capture_screen()
             if self.current_type_index >= 2:
                 timer_vis_sim = self.check_timer_visibility()
                 timer_milli_sim = 0
                 if self.timer_detected:
                     timer_milli_sim = self.check_timer_movement()
-            if self.current_type_index == 1:
-                players = [player for team in self.game.teams for player in team.players]
-                names = {player.character_name for player in players}
-                if len(names) < len(players) and not self.game.team_mode:
-                    _print('GAME CANCELLED DUE TO DUPLICATE CHARACTER IN FFA')
-                    self.game.cancelled = True
-                    # self.current_type_index = 5
-                    # self.read_screen_data()
-                if '...' in names:
-                    _print('GAME CANCELLED DUE TO UNREADABLE CHARACTER NAME')
             if self.current_type_index == 2:
                 if self.timer_detected:
                     _print(f'timer detected: {timer_vis_sim}')
@@ -162,8 +156,8 @@ class Watcher(threading.Thread):
 
 
     def read_screen_data(self):
+        print(self.current_type_index)
         if self.current_type_index == 0:
-            self.game = smash_game.Game(self.current_game_num)
             self.gui_queue.put('update')
             _print('Flags detected')
             self.gui_queue.put({'status': 'Watching for card screen'})
@@ -194,8 +188,8 @@ class Watcher(threading.Thread):
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for flag screen'})
             ut.save_game_data(self.game.serialize())
-        self.current_type_index += 1
         if self.current_type_index >= 6:
             self.reset()
+        self.current_type_index += 1
         _print(f'Mode changed to {self.current_type_index}')
         # _print(json.dumps(self.game.serialize(), separators=(',', ': ')))

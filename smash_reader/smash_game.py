@@ -236,13 +236,14 @@ class Game:
             self.cancelled = True
 
 
-    # HERE -
-
-
     def read_start_screen(self, screen):
+        time.sleep(1)
+        screen = ut.capture_screen()
         if not self.team_mode and not self.cancelled:
-            # self.fix_colors(screen)
-            pass
+            try:
+                self.fix_colors(screen)
+            except:
+                _print('Error fixing colors')
         if self.mode == 'Stock':
             self.get_stock_templates(screen)
         elif self.mode == 'Time':
