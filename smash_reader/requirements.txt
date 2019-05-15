@@ -9,6 +9,7 @@ networkx==2.3
 numpy==1.16.2
 opencv-python==4.1.0.25
 Pillow==6.0.0
+psycopg2==2.8.2
 pynput==1.4.2
 pyparsing==2.4.0
 pytesseract==0.2.6
