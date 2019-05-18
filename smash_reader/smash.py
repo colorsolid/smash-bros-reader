@@ -130,6 +130,7 @@ class PlayerFrame(tk.Frame):
             self.player_name_label.image = bitmap
             self.player_name_label.grid(row=1, column=1, sticky='nw', padx=10)
         except TypeError:
+            _print(arr)
             _print('Image data corrupted')
             try:
                 ut.dump_image_data(arr)
