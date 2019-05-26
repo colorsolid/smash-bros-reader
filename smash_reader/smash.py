@@ -5,6 +5,7 @@ import numpy as np
 import os
 from   PIL import Image, ImageTk
 from   queue import Queue, Empty
+import requests
 import smash_game
 import smash_utility as ut
 import smash_watcher

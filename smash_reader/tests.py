@@ -7,6 +7,7 @@ import numpy as np
 import os
 from   pynput import keyboard
 import re
+import requests
 import select
 import smash_game
 import smash_utility as ut
@@ -17,13 +18,24 @@ import threading
 from queue import Empty, Queue
 
 #from matplotlib import pyplot as plt
-from PIL import Image, ImageChops, ImageDraw, ImageGrab
+from PIL import Image, ImageChops, ImageDraw
 
 
 BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 CAPTURES_DIR = os.path.join(BASE_DIR, 'captures')
 if not os.path.isdir(CAPTURES_DIR):
     os.mkdir(CAPTURES_DIR)
+
+
+def req(message='Hella tests'):
+    URL = 'http://localhost:8000/reader_info/'
+    DATA = {
+        'secret_code': 'Mj76uiJ*(967%GVr57UNJ*^gBVD#W4gJ)ioM^)',
+        'data': message
+    }
+    r = requests.post(url = URL, json = DATA)
+    print(r.status_code)
+    print(r.text)
 
 
 class KeyThread(threading.Thread):
