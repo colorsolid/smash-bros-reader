@@ -1,4 +1,5 @@
 import cv2
+from   datetime import datetime
 import json
 from   logger import log_exception
 import matplotlib.pyplot as plt
@@ -6,7 +7,10 @@ import mss
 import numpy as np
 from   PIL import Image, ImageChops
 import pytesseract
+import random
+import requests
 from   skimage.measure import compare_ssim
+import string
 import subprocess
 import os
 import sys
@@ -336,6 +340,53 @@ def rgb_to_hex(rgb):
 #####################################################################
 
 
+def simplify_players(game):
+    players = []
+    for team in game['teams']:
+        color = team['color']
+        for player in team['players']:
+            keys = list(player.keys())
+            for key in keys:
+                if not player[key]:
+                    del player[key]
+            player['color'] = color
+            players.append(player)
+    return players
+
+
+
+def filter_game_data(game, mode):
+    simple_game = {}
+    if mode == 1:
+        simple_game['players'] = simplify_players(game)
+        simple_game['map'] = game['map']
+        simple_game['team_mode'] = game['team_mode']
+        simple_game['game_mode'] = game['mode']
+        simple_game['cancelled'] = game['cancelled']
+    if mode == 3:
+        if not game['team_mode']:
+            for team in game['teams']:
+                simple_game['players'] = simplify_players(game)
+            simple_game['start_time'] = -1
+    if mode == 4:
+        simple_game = {'end_time': -1}
+    if mode == 5:
+        simple_game = {'winning_team': game['winning_color']}
+    return simple_game
+
+
+def post_data(message='No message'):
+    URL = 'http://localhost:8000/reader_info/'
+    DATA = {
+        'secret_code': 't7q72Uo_0vs{NKRmH=3g3apvsf3zoW!8,b6]nj)',
+        'data': message
+    }
+    try:
+        r = requests.post(url=URL, json=DATA)
+        return r
+    except requests.exceptions.ConnectionError:
+        return None
+
 
 def dump_image_data(arr):
     filepath = os.path.join(BASE_DIR, 'img_dump.json')
@@ -405,3 +456,9 @@ def send_command():
     # subprocess.Popen()
     # PIGPIO_ADDR=169.254.183.202
     pass
+
+
+def random_str(l=10):
+    """Generate a random string of letters, digits and special characters """
+    password_characters = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choice(password_characters) for i in range(l))

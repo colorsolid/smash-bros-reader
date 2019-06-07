@@ -18,7 +18,7 @@ excepthook = log_exception
 
 TITLE = 'SmashBet Screen Watcher'
 
-output = True
+output = False
 def _print(*args, **kwargs):
     if output:
         args = list(args)
@@ -64,7 +64,7 @@ class Menubar(tk.Menu):
 
         self.debug_menu.add_cascade(label='Outputs', menu=self.output_menu)
         self.debug_menu.add_separator()
-        self.debug_menu.add_command(label='Print game data', command=lambda: print(self.master.game))
+        self.debug_menu.add_command(label='Print game data', command=lambda: print(self.master.watcher.game.serialize(images_bool=False)))
         self.debug_menu.add_separator()
         self.debug_menu.add_command(label='Capture cards_id template', command=ut.capture_cards_id)
 
@@ -95,6 +95,7 @@ class Menubar(tk.Menu):
             path = os.path.join(BASE_DIR, 'game_state.json')
             with open(path, 'w+') as outfile:
                 json.dump(game, outfile)
+
 
 class PlayerFrame(tk.Frame):
     def __init__(self, master, player_info, *args, **kwargs):
@@ -206,12 +207,12 @@ class GameFrame(tk.Frame):
         self.game_number.set(f'Game #{game["number"]}')
         self.game_map.set(f'Map: {game["map"]}')
         self.game_mode.set(f'Mode: {game["mode"]}')
-        if game['duration']:
-            self.game_duration.set(f'Game completed in {game["duration"]} seconds')
-        elif game['start_time']:
+        if game['start_time']:
             self.game_duration.set(
                 f'Game began {time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(game["start_time"]))}'
             )
+        elif game['duration']:
+            self.game_duration.set(f'Game completed in {game["duration"]} seconds')
         self.build_team_frames(game)
 
 

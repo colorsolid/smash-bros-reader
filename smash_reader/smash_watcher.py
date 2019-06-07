@@ -3,6 +3,7 @@ from   logger import log_exception
 import os
 from   queue import Empty
 import re
+import requests
 import smash_game
 import smash_utility as ut
 import sys
@@ -155,8 +156,19 @@ class Watcher(threading.Thread):
         pass
 
 
+    def filter_and_post(self, game):
+        data = {
+            'game': ut.filter_game_data(
+                game,
+                self.current_type_index
+            ),
+            'mode': self.current_type_index
+        }
+        ut.post_data(data)
+
+
+
     def read_screen_data(self):
-        print(self.current_type_index)
         if self.current_type_index == 0:
             self.gui_queue.put('update')
             _print('Flags detected')
@@ -167,6 +179,7 @@ class Watcher(threading.Thread):
             time.sleep(1)
             self.cap = ut.capture_screen()
             self.game.read_card_screen(self.cap)
+            self.filter_and_post(self.game.serialize(images_bool=False))
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle pregame'})
         if self.current_type_index == 2:
@@ -176,18 +189,21 @@ class Watcher(threading.Thread):
             self.gui_queue.put({'status': 'Watching for battle start'})
         if self.current_type_index == 3:
             _print('Battle started')
+            self.filter_and_post(self.game.serialize(images_bool=False))
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle end'})
         if self.current_type_index == 4:
             _print('Battle end detected')
+            self.filter_and_post(self.game.serialize(images_bool=False))
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle results'})
         if self.current_type_index == 5:
             _print('Battle results detected')
             self.game.read_results_screen(self.cap)
+            self.filter_and_post(self.game.serialize(images_bool=False))
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for flag screen'})
-            ut.save_game_data(self.game.serialize())
+            # ut.save_game_data(self.game.serialize())
         self.current_type_index += 1
         _print(f'Mode changed to {self.current_type_index}')
         if self.current_type_index >= 6:

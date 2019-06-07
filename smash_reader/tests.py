@@ -1,6 +1,7 @@
 import argparse
 import cv2
 import difflib
+import json
 import matplotlib.pyplot as plt
 import mss
 import numpy as np
@@ -27,15 +28,20 @@ if not os.path.isdir(CAPTURES_DIR):
     os.mkdir(CAPTURES_DIR)
 
 
-def req(message='Hella tests'):
+def test_game_data():
+    with open('game_state.json', 'r') as infile:
+        game = json.load(infile)
+    ut.filter_game_data(game, 1)
+
+
+def req(message='No message'):
     URL = 'http://localhost:8000/reader_info/'
     DATA = {
         'secret_code': 'Mj76uiJ*(967%GVr57UNJ*^gBVD#W4gJ)ioM^)',
         'data': message
     }
     r = requests.post(url = URL, json = DATA)
-    print(r.status_code)
-    print(r.text)
+    return r
 
 
 class KeyThread(threading.Thread):
@@ -399,5 +405,6 @@ def ocr_test():
 
 if __name__ == '__main__':
     #ocr_test()
-    fight_tester()
+    #fight_tester()
+    test_game_data()
     pass
