@@ -4,6 +4,7 @@ from   logger import log_exception
 import numpy as np
 import os
 from   PIL import Image, ImageTk
+import platform
 from   queue import Queue, Empty
 import requests
 import smash_game
@@ -121,11 +122,11 @@ class PlayerFrame(tk.Frame):
         for i, row in enumerate(img):
             img[i] = [pixel * 255 for pixel in img[i]]
         arr = np.asarray(img)
-        # arr = np.array(self.info['player_name_image'])
+        arr = np.array(self.info['player_name_image'])
         try:
             img = Image.fromarray(arr)
             img = img.resize((200, 30), Image.NEAREST)
-            # img.show()
+            img.show()
             img = img.convert('1').tobitmap()
             bitmap = ImageTk.BitmapImage(data=img)
             self.player_name_label = tk.Label(self, image=bitmap, bg=self.master['background'])
@@ -338,7 +339,11 @@ def run_gui():
         window.watcher.join()
 
     if window.restart_flag:
-        os.system(__file__)
+        system = platform.system()
+        if system == 'Windows':
+            os.system(__file__)
+        if system == 'Linux':
+            os.system('python3 ' + __file__)
 
 
 def headless():

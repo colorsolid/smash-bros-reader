@@ -1,3 +1,11 @@
+[2019-06-08 19:40:42]
+Traceback (most recent call last):
+  File "smash.py", line 372, in <module>
+    run_gui()
+  File "smash.py", line 346, in run_gui
+    os.system('python3', __file__)
+TypeError: system() takes at most 1 argument (2 given)
+
 [2019-06-06 23:50:39]
 KeyboardInterrupt
 
