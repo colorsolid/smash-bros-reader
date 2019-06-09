@@ -33,7 +33,8 @@ class Watcher(threading.Thread):
             (),
             (),
             ('GAME', 'END_ID'),
-            ('FINAL', 'ID')
+            ('FINAL', 'ID'),
+            ('FINAL', 'ID2')
         ]
 
         self.reset()
@@ -85,7 +86,7 @@ class Watcher(threading.Thread):
             # check to see if the timer is stopped, or the "GAME" text is
             # detected, or the results screen is detected
             elif self.current_type_index == 4:
-                if self.check_screen_basic():
+                if self.check_screen_basic() > 90:
                     # pass because read_screen_data will be called if True
                     # and the rest of the checks will be skipped
                     pass
@@ -95,8 +96,11 @@ class Watcher(threading.Thread):
                         self.read_screen_data()
                     # Results screen detected
                     else:
-                        check = self.check_screen_basic(index=5, normal=False)
-                        if check:
+                        checks = [
+                            self.check_screen_basic(index=5, normal=False),
+                            self.check_screen_basic(index=6, normal=False)
+                        ]
+                        if sum(checks) / 2 > 90:
                             # run twice because the match end screen was missed
                             self.read_screen_data()
                             self.read_screen_data()
@@ -118,23 +122,24 @@ class Watcher(threading.Thread):
 
 
     # @ut.pad_time(0.20)
-    def check_screen_basic(self, index=-1, normal=True):
+    def check_screen_basic(self, index=-1, normal=True, screen=None, area=None):
         if index == -1:
             index = self.current_type_index
-        screen, area = self.id_coords[index]
+        if not screen and not area:
+            screen, area = self.id_coords[index]
         sim = ut.area_sim(self.cap, screen, area)
 
-        self.sim_lists[index].insert(0, sim)
-        del self.sim_lists[index][-1]
+        l = self.sim_lists[index]
+        l.insert(0, sim)
+        del l[-1]
 
-        avg = sum(self.sim_lists[index]) / len(self.sim_lists[index])
+        avg = sum(l) / len(l)
         if avg > 90:
             _print(f'Screen type {{index}} sim: {avg}')
-            self.sim_lists[index] = [0] * self.list_limit
             if normal:
+                l = [0] * self.list_limit
                 self.read_screen_data()
-            return True
-        return False
+        return avg
 
 
     def check_timer_visibility(self):

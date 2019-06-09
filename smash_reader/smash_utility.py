@@ -81,6 +81,7 @@ COORDS = {
             (468, 49, 550, 296),
             (204, 388, 286, 635)
         ),
+        'ID2': (1825, 0, 1864, 73),
         'VICTORY_TEAM': (745, 870, 833, 978),
         'VICTORY_PLAYER': (125, 168, 126, 169),
         '2ND_PLACE': (525, 982, 526, 983),
@@ -395,12 +396,11 @@ def post_data(message='No message'):
         'secret_code': 't7q72Uo_0vs{NKRmH=3g3apvsf3zoW!8,b6]nj)',
         'data': message
     }
-    print(json.dumps(DATA))
     try:
         r = requests.post(url=URL, json=DATA)
         return r
     except requests.exceptions.ConnectionError:
-        print(requests.exceptions.ConnectionError)
+        print('Unable to reach REST API')
         return None
 
 

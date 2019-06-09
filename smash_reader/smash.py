@@ -119,14 +119,18 @@ class PlayerFrame(tk.Frame):
         self.gsp_label.grid(row=1, column=0, sticky='nsw', padx=10)
 
         img = self.info['player_name_image']
-        for i, row in enumerate(img):
-            img[i] = [pixel * 255 for pixel in img[i]]
+        #for i, row in enumerate(img):
+        #    img[i] = [pixel * 255 for pixel in img[i]]
         arr = np.asarray(img)
+        print(1, arr)
         arr = np.array(self.info['player_name_image'])
+        print(2, arr)
+        # arr = [val/255 for row in arr for val in row]
         try:
-            img = Image.fromarray(arr)
+            img = Image.fromarray(arr.astype('uint8'))
             img = img.resize((200, 30), Image.NEAREST)
-            img.show()
+            print('IMAGE', img)
+            img.save('test.png')
             img = img.convert('1').tobitmap()
             bitmap = ImageTk.BitmapImage(data=img)
             self.player_name_label = tk.Label(self, image=bitmap, bg=self.master['background'])

@@ -105,7 +105,7 @@ class Player:
     # @ut.time_this
     def crop_player_name(self, card):
         crop = card.crop(ut.COORDS['LOBBY']['PLAYER']['NAME'])
-        img, self.player_name_image = ut.convert_to_bw(crop, 20, False)
+        img, self.player_name_image = ut.convert_to_bw(crop, 120, False)
         # img.show()
 
 
