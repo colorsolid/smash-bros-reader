@@ -273,6 +273,20 @@ def compare_skim(sample, template, true_color=False):
     return 0
 
 
+def area_sim(cap, screen, area):
+    template = TEMPLATES[screen][area]
+    coords = COORDS[screen][area]
+    if not isinstance(coords[0], (list, tuple)):
+        coords = [coords]
+    high_sim = 0
+    for coord in coords:
+        crop = cap.crop(coord)
+        sim = avg_sim(crop, template)
+        if sim > high_sim:
+            high_sim = sim
+    return high_sim
+
+
 def avg_sim(sample, template, true_color=False):
     comp_funcs = (compare_chops, compare_skim)
     sims = [comp_func(sample, template, true_color) for comp_func in comp_funcs]
@@ -381,10 +395,12 @@ def post_data(message='No message'):
         'secret_code': 't7q72Uo_0vs{NKRmH=3g3apvsf3zoW!8,b6]nj)',
         'data': message
     }
+    print(json.dumps(DATA))
     try:
         r = requests.post(url=URL, json=DATA)
         return r
     except requests.exceptions.ConnectionError:
+        print(requests.exceptions.ConnectionError)
         return None
 
 
@@ -460,5 +476,5 @@ def send_command():
 
 def random_str(l=10):
     """Generate a random string of letters, digits and special characters """
-    password_characters = string.ascii_letters + string.digits + string.punctuation
+    password_characters = string.ascii_letters + string.digits
     return ''.join(random.choice(password_characters) for i in range(l))

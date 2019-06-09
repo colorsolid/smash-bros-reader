@@ -1,3 +1,45 @@
+[2019-06-06 23:50:39]
+KeyboardInterrupt
+
+[2019-06-06 23:47:52]
+KeyboardInterrupt
+
+[2019-06-06 23:05:54]
+Traceback (most recent call last):
+  File "smash.py", line 367, in <module>
+    run_gui()
+  File "smash.py", line 334, in run_gui
+    root.mainloop()
+  File "/usr/lib/python3.7/tkinter/__init__.py", line 1283, in mainloop
+    self.tk.mainloop(n)
+  File "/usr/lib/python3.7/tkinter/__init__.py", line 1700, in __call__
+    def __call__(self, *args):
+KeyboardInterrupt
+
+[2019-06-06 22:59:09]
+Traceback (most recent call last):
+  File "smash.py", line 367, in <module>
+    run_gui()
+  File "smash.py", line 334, in run_gui
+    root.mainloop()
+  File "/usr/lib/python3.7/tkinter/__init__.py", line 1283, in mainloop
+    self.tk.mainloop(n)
+  File "/usr/lib/python3.7/tkinter/__init__.py", line 1700, in __call__
+    def __call__(self, *args):
+KeyboardInterrupt
+
+[2019-06-06 22:39:03]
+Traceback (most recent call last):
+  File "smash.py", line 367, in <module>
+    run_gui()
+  File "smash.py", line 334, in run_gui
+    root.mainloop()
+  File "/usr/lib/python3.7/tkinter/__init__.py", line 1283, in mainloop
+    self.tk.mainloop(n)
+  File "/usr/lib/python3.7/tkinter/__init__.py", line 1700, in __call__
+    def __call__(self, *args):
+KeyboardInterrupt
+
 [2019-06-06 20:26:02]
 Traceback (most recent call last):
   File "smash.py", line 367, in <module>

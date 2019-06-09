@@ -231,7 +231,7 @@ class Game:
         if len(self.teams) == 2 and self.player_count > 2:
             self.team_mode = True
             self.colors_correct = True
-        if len(set(players)) < len(players):
+        elif len(set(players)) < len(players):
             _print('GAME CANCELLED DUE TO DUPLICATE CHARACTER IN FFA')
             self.cancelled = True
 

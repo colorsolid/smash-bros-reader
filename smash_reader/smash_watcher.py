@@ -32,17 +32,18 @@ class Watcher(threading.Thread):
             ('LOBBY', 'CARDS_ID'),
             (),
             (),
-            (),
+            ('GAME', 'END_ID'),
             ('FINAL', 'ID')
         ]
 
         self.reset()
 
 
+    # Game finished or cancelled
     def reset(self):
         self.current_type_index = 0
         self.list_limit = 3
-        self.sim_list = [0] * self.list_limit
+        self.sim_lists = [[0] * self.list_limit for _ in range(len(self.id_coords))]
         self.cont = True
         self.current_game_num = len(ut.load_game_data()) + 1
         self.game = smash_game.Game(self.current_game_num)
@@ -53,34 +54,57 @@ class Watcher(threading.Thread):
         self.timer_sim_hits = 0
 
 
+    # Starts when watcher is created and loops forever
     def run(self):
         _print('Watching for flags')
         self.gui_queue.put({'status': 'Watching for flag screen'})
         while self.cont:
+            timer_vis_sim = 0
+            timer_milli_sim = 0
             if self.game.cancelled:
                 self.reset()
                 self.gui_queue.put('update')
                 self.gui_queue.put({'status': 'Watching for flag screen'})
             self.cap = ut.capture_screen()
+            # check timer visibility and movement, set class variables
             if self.current_type_index >= 2:
                 timer_vis_sim = self.check_timer_visibility()
                 timer_milli_sim = 0
                 if self.timer_detected:
                     timer_milli_sim = self.check_timer_movement()
+            # look for the timer at the beginning
             if self.current_type_index == 2:
                 if self.timer_detected:
                     _print(f'timer detected: {timer_vis_sim}')
                     self.read_screen_data()
+            # wait for the timer to start moving
             elif self.current_type_index == 3:
                 if self.timer_running:
                     _print(f'timer movemement detected: {timer_milli_sim}')
                     self.read_screen_data()
+            # check to see if the timer is stopped, or the "GAME" text is
+            # detected, or the results screen is detected
             elif self.current_type_index == 4:
-                self.read_screen_data()
+                if self.check_screen_basic():
+                    # pass because read_screen_data will be called if True
+                    # and the rest of the checks will be skipped
+                    pass
+                else:
+                    # Timer stopped
+                    if not self.timer_running:
+                        self.read_screen_data()
+                    # Results screen detected
+                    else:
+                        check = self.check_screen_basic(index=5, normal=False)
+                        if check:
+                            # run twice because the match end screen was missed
+                            self.read_screen_data()
+                            self.read_screen_data()
+            # check for current basic template (flags, cards, results)
             else:
                 self.check_screen_basic()
             self.check_queue()
-            time.sleep(0.01)
+            time.sleep(0.1)
 
 
     def check_queue(self):
@@ -94,24 +118,23 @@ class Watcher(threading.Thread):
 
 
     # @ut.pad_time(0.20)
-    def check_screen_basic(self):
-        screen, area = self.id_coords[self.current_type_index]
-        coords = ut.COORDS[screen][area]
-        if (screen, area) == ('FINAL', 'ID'):
-            if self.game.team_mode:
-                coords = coords[1]
-            else:
-                coords = coords[0]
-        crop = self.cap.crop(coords)
-        template = ut.TEMPLATES[screen][area]
-        self.sim = ut.avg_sim(crop, template)
-        self.sim_list.insert(0, self.sim)
-        del self.sim_list[-1]
-        avg = sum(self.sim_list) / len(self.sim_list)
+    def check_screen_basic(self, index=-1, normal=True):
+        if index == -1:
+            index = self.current_type_index
+        screen, area = self.id_coords[index]
+        sim = ut.area_sim(self.cap, screen, area)
+
+        self.sim_lists[index].insert(0, sim)
+        del self.sim_lists[index][-1]
+
+        avg = sum(self.sim_lists[index]) / len(self.sim_lists[index])
         if avg > 90:
-            _print(f'Screen type sim: {avg}')
-            self.read_screen_data()
-            self.sim_list = [0] * self.list_limit
+            _print(f'Screen type {{index}} sim: {avg}')
+            self.sim_lists[index] = [0] * self.list_limit
+            if normal:
+                self.read_screen_data()
+            return True
+        return False
 
 
     def check_timer_visibility(self):
@@ -167,12 +190,13 @@ class Watcher(threading.Thread):
         ut.post_data(data)
 
 
-
     def read_screen_data(self):
+        # Flags
         if self.current_type_index == 0:
             self.gui_queue.put('update')
             _print('Flags detected')
             self.gui_queue.put({'status': 'Watching for card screen'})
+        # Cards
         if self.current_type_index == 1:
             _print('Flags cards')
             self.gui_queue.put({'status': 'Reading cards'})
@@ -182,21 +206,25 @@ class Watcher(threading.Thread):
             self.filter_and_post(self.game.serialize(images_bool=False))
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle pregame'})
+        # Pregame
         if self.current_type_index == 2:
             _print('Battle pregame detected')
             self.game.read_start_screen(self.cap)
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle start'})
+        # Game started
         if self.current_type_index == 3:
             _print('Battle started')
             self.filter_and_post(self.game.serialize(images_bool=False))
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle end'})
+        # Game ended
         if self.current_type_index == 4:
             _print('Battle end detected')
             self.filter_and_post(self.game.serialize(images_bool=False))
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle results'})
+        # Results
         if self.current_type_index == 5:
             _print('Battle results detected')
             self.game.read_results_screen(self.cap)
@@ -205,7 +233,7 @@ class Watcher(threading.Thread):
             self.gui_queue.put({'status': 'Watching for flag screen'})
             # ut.save_game_data(self.game.serialize())
         self.current_type_index += 1
-        _print(f'Mode changed to {self.current_type_index}')
         if self.current_type_index >= 6:
             self.reset()
+        _print(f'Mode changed to {self.current_type_index}')
         # _print(json.dumps(self.game.serialize(), separators=(',', ': ')))
