@@ -335,10 +335,13 @@ def match_color(pixel=None, arr=[], mode=None):
 
 
 def stencil(crop):
-    _, w_arr = convert_to_bw(crop, 254, inv=False)
+    w_pil, w_arr = convert_to_bw(crop, 254, inv=False)
     b_pil, _ = convert_to_bw(crop, 1, inv=False)
-    fill_border(b_pil)
-    b_arr = np.array(b_pil)
+    b_fil = b_pil.copy()
+    print(b_pil)
+    print(b_fil)
+    fill_border(b_fil)
+    b_arr = np.array(b_fil)
     result = []
     for r1, r2 in zip(w_arr, b_arr):
         r = []
@@ -350,7 +353,8 @@ def stencil(crop):
         result.append(r)
     arr = np.array(result)
     img = Image.fromarray(arr.astype('uint8'))
-    return img
+    imgs = [crop, w_pil, b_pil, b_fil, img]
+    return imgs
 
 
 def fill_border(img):

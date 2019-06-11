@@ -75,7 +75,8 @@ class Player:
     # @ut.time_this
     def get_character_name(self, card):
         crop = card.crop(ut.COORDS['LOBBY']['PLAYER']['CHARACTER_NAME'])
-        pil = ut.stencil(crop)
+        pils = ut.stencil(crop)
+        pil = pils[-1]
         template_name, sim = ut.find_most_similar(pil, ut.TEMPLATES['CHARACTER_NAMES'])
         if sim > 95:
             self.character_name = re.match('(.+)(-\d*)', template_name).group(1)
@@ -114,13 +115,15 @@ class Player:
                         ut.TEMPLATES['UNREADABLE'][num] = pil
                         pil.save(os.path.join(ut.TEMPLATES_DIR, 'unreadable', filename))
             _print(f'{name_as_read.rjust(30)} --> {self.character_name}')
+        if False:
+            for i, img in enumerate(pils):
+                img.save(f'misc/character_names/{self.character_name}-{i}.png')
 
 
     # @ut.time_this
     def crop_player_name(self, card):
         crop = card.crop(ut.COORDS['LOBBY']['PLAYER']['NAME'])
         img, self.player_name_image = ut.convert_to_bw(crop, 120, False)
-        # img.show()
 
 
     # @ut.time_this
