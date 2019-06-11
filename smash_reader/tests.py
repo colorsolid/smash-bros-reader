@@ -27,6 +27,13 @@ if not os.path.isdir(CAPTURES_DIR):
     os.mkdir(CAPTURES_DIR)
 
 
+def test_pixel():
+    img = Image.open('1560221662.467294.png')
+    img = ut.filter_color2(img, (0, 10))
+    p = plt.imshow(img)
+    plt.show()
+
+
 def test_stencil():
     img = Image.open('1560219739.917792.png')
     ut.stencil(img)
@@ -410,5 +417,6 @@ if __name__ == '__main__':
     #ocr_test()
     #fight_tester()
     #test_game_data()
-    test_stencil()
+    #test_stencil()
+    test_pixel()
     pass

@@ -381,6 +381,22 @@ def filter_color(image, color):
     return result
 
 
+def filter_color2(img, coords):
+    arr = np.array(img)
+    x, y = coords
+    pixel = list(arr[y][x])
+    result = []
+    for row in arr:
+        r = []
+        for p in row:
+            if list(p) == pixel:
+                r.append(255)
+            else:
+                r.append(0)
+        result.append(r)
+    return result
+
+
 def rgb_to_hex(rgb):
     return '#%02x%02x%02x' % rgb
 

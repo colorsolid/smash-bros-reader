@@ -336,7 +336,6 @@ class Window(tk.Frame):
 def run_gui():
     root = tk.Tk()
     root.geometry('540x550')
-    # root.iconbitmap(os.path.join(BASE_DIR, 'icon.ico'))
     window = Window(root, bg=BG[0])
 
     root.mainloop()

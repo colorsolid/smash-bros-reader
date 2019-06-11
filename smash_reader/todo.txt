@@ -1,4 +1,3 @@
-Finish victory screen detection
 Make stock reading live
 Add time mode score detection
 HP mode
