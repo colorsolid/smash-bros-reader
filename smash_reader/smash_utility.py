@@ -5,7 +5,7 @@ from   logger import log_exception
 import matplotlib.pyplot as plt
 import mss
 import numpy as np
-from   PIL import Image, ImageChops
+from   PIL import Image, ImageChops, ImageDraw
 import pytesseract
 import random
 import requests
@@ -47,7 +47,7 @@ COORDS = {
         'CARDS_SLICE_COLORS': (0, 813, 1920, 814),
         'PLAYER': {
             'TEAM_COLOR': (17, 458, 18, 459),
-            'CHARACTER_NAME': (0, 369, 396, 423),
+            'CHARACTER_NAME': (0, 367, 396, 430),
             'NAME': (129, 436, 389, 475),
             'NUMBER': (37, 441, 82, 471),
             'GSP': (131, 490, 384, 526)
@@ -332,6 +332,41 @@ def match_color(pixel=None, arr=[], mode=None):
         if sim > best_match[1]:
             best_match = (color_name, sim)
     return best_match
+
+
+def stencil(crop):
+    _, w_arr = convert_to_bw(crop, 254, inv=False)
+    b_pil, _ = convert_to_bw(crop, 1, inv=False)
+    fill_border(b_pil)
+    b_arr = np.array(b_pil)
+    result = []
+    for r1, r2 in zip(w_arr, b_arr):
+        r = []
+        for p1, p2 in zip(r1, r2):
+            if int(p1) and int(p2):
+                r.append(0)
+            else:
+                r.append(255)
+        result.append(r)
+    arr = np.array(result)
+    img = Image.fromarray(arr.astype('uint8'))
+    return img
+
+
+def fill_border(img):
+    while True:
+        arr = np.array(img)
+        row_count = len(arr)
+        for row_i, row in enumerate(arr):
+            col_count = len(row)
+            for p_i, p in enumerate(row):
+                if int(p):
+                    if row_i == 0 or row_i == row_count \
+                    or p_i == 0 or p_i == col_count:
+                        ImageDraw.floodfill(img, (p_i, row_i), 0)
+                        continue
+        break
+
 
 
 def filter_color(image, color):

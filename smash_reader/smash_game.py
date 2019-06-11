@@ -14,6 +14,8 @@ import time
 sys.excepthook = log_exception
 
 
+character_name_debugging_enabled = False
+
 output = True
 def _print(*args, **kwargs):
     if output:
@@ -28,6 +30,8 @@ STOCK_SPACING = 26
 with open('fighter_list.json', 'r') as infile:
     CHARACTER_NAMES = json.load(infile)
 CHARACTER_NAMES = [name.lower() for name in CHARACTER_NAMES]
+
+BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 
 
 class ImageProcessor(threading.Thread):
@@ -71,16 +75,26 @@ class Player:
     # @ut.time_this
     def get_character_name(self, card):
         crop = card.crop(ut.COORDS['LOBBY']['PLAYER']['CHARACTER_NAME'])
-        pil, arr = ut.convert_to_bw(crop, 240)
-        # template_name, sim = find_most_similar(pil, TEMPLATES['CHARACTER_NAMES'])
-        sim = 0
+        pil = ut.stencil(crop)
+        template_name, sim = ut.find_most_similar(pil, ut.TEMPLATES['CHARACTER_NAMES'])
         if sim > 95:
-            self.character_name = template_name
+            self.character_name = re.match('(.+)(-\d*)', template_name).group(1)
         else:
             name_as_read = ut.read_image(pil).lower()
             name = difflib.get_close_matches(name_as_read, CHARACTER_NAMES, n=1)
             if len(name):
                 name = name[0]
+                if character_name_debugging_enabled:
+                    _template_name, _sim = ut.find_most_similar(pil, ut.TEMPLATES['CHARACTER_NAMES_DUMP'])
+                    if _sim < 99:
+                        num = 1
+                        for _name in ut.TEMPLATES['CHARACTER_NAMES_DUMP']:
+                            print(name, _name)
+                            if name in _name:
+                                num += 1
+                        filename = f'{name}-{num}.png'
+                        path = os.path.join(BASE_DIR, 'templates', 'character_names_dump', filename)
+                        pil.save(path)
                 self.character_name = name
             else:
                 self.character_name = '...'
@@ -208,8 +222,6 @@ class Game:
             elif id_pixel == 255:
                 card_boundary = (i - 62, 375, i + 341, 913)
                 crop = screen.crop(card_boundary)
-                crop2 = crop.crop(ut.COORDS['LOBBY']['CHARACTER_TEMPLATE'])
-                # crop2.save(f'{time.time()}.png')
                 color = ut.match_color(arr=color_pixels[i - 5], mode='CARDS')[0]
 
                 player = Player()

@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import mss
 import numpy as np
 import os
-from   pynput import keyboard
 import re
 import requests
 import select
@@ -26,6 +25,11 @@ BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 CAPTURES_DIR = os.path.join(BASE_DIR, 'captures')
 if not os.path.isdir(CAPTURES_DIR):
     os.mkdir(CAPTURES_DIR)
+
+
+def test_stencil():
+    img = Image.open('1560219739.917792.png')
+    ut.stencil(img)
 
 
 def test_game_data():
@@ -123,7 +127,6 @@ def crop_char_game():
         name_as_read = ut.read_image(bw).lower()
         name = difflib.get_close_matches(name_as_read, smash_game.CHARACTER_NAMES, n=1)
         print(name)
-
 
 
 def filter():
@@ -406,5 +409,6 @@ def ocr_test():
 if __name__ == '__main__':
     #ocr_test()
     #fight_tester()
-    test_game_data()
+    #test_game_data()
+    test_stencil()
     pass

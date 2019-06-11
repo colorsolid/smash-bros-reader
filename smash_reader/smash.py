@@ -68,6 +68,7 @@ class Menubar(tk.Menu):
         self.debug_menu.add_command(label='Print game data', command=lambda: print(self.master.watcher.game.serialize(images_bool=False)))
         self.debug_menu.add_separator()
         self.debug_menu.add_command(label='Capture cards_id template', command=ut.capture_cards_id)
+        self.debug_menu.add_command(label='Character name debugging', command=self.master.character_name_debugging)
 
         self.add_cascade(label='File', menu=self.file_menu)
         self.add_cascade(label='Debug', menu=self.debug_menu)
@@ -118,19 +119,10 @@ class PlayerFrame(tk.Frame):
         self.gsp_label = tk.Label(self, text=f'GSP: {self.info["gsp"]}', bg=self['background'])
         self.gsp_label.grid(row=1, column=0, sticky='nsw', padx=10)
 
-        img = self.info['player_name_image']
-        #for i, row in enumerate(img):
-        #    img[i] = [pixel * 255 for pixel in img[i]]
-        arr = np.asarray(img)
-        print(1, arr)
         arr = np.array(self.info['player_name_image'])
-        print(2, arr)
-        # arr = [val/255 for row in arr for val in row]
         try:
             img = Image.fromarray(arr.astype('uint8'))
             img = img.resize((200, 30), Image.NEAREST)
-            print('IMAGE', img)
-            img.save('test.png')
             img = img.convert('1').tobitmap()
             bitmap = ImageTk.BitmapImage(data=img)
             self.player_name_label = tk.Label(self, image=bitmap, bg=self.master['background'])
@@ -277,6 +269,7 @@ class Window(tk.Frame):
         self.cont = True
         self.queue = Queue()
         self.watcher_queue = Queue()
+        self.character_name_debugging_enabled = False
 
         self.watcher = smash_watcher.Watcher(self.watcher_queue, self.queue)
         self.watcher.daemon = True
@@ -328,6 +321,16 @@ class Window(tk.Frame):
     def restart(self):
         self.quit()
         self.restart_flag = True
+
+
+    def character_name_debugging(self):
+        if not self.character_name_debugging_enabled:
+            self.watcher.lock(1)
+            smash_game.character_name_debugging_enabled = True
+        else:
+            self.watcher.unlock()
+            smash_game.character_name_debugging_enabled = False
+        self.character_name_debugging_enabled = not self.character_name_debugging_enabled
 
 
 def run_gui():
