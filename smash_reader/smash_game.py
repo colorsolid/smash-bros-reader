@@ -340,7 +340,12 @@ class Game:
                         _print(f'{name_as_read.rjust(30)} --> {name}')
                         names.append(name[0])
                     else:
-                        _print(f'Can\'t read <{name_as_read}>')
+                        trainer_names = ['squirtle', 'charizard', 'ivysaur']
+                        name = difflib.get_close_matches(name_as_read, trainer_names, n=1)
+                        if len(name):
+                            names.append('pokémon trainer')
+                        else:
+                            _print(f'Can\'t read <{name_as_read}>')
                     # template.show()
                     # template.save(f'{time.time()}.png')
                 else:
