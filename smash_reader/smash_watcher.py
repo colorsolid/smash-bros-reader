@@ -104,7 +104,7 @@ class Watcher(threading.Thread):
                             self.check_screen_basic(index=5, normal=False),
                             self.check_screen_basic(index=6, normal=False)
                         ]
-                        if sum(checks) / 2 > 90:
+                        if sum(checks) / 2 > 80:
                             # run twice because the match end screen was missed
                             self.read_screen_data()
                             self.read_screen_data()
