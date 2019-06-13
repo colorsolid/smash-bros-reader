@@ -27,6 +27,10 @@ if not os.path.isdir(CAPTURES_DIR):
     os.mkdir(CAPTURES_DIR)
 
 
+def post_fake(data={'mode': 1, 'game': {'players': []}}):
+    ut.post_data(data)
+
+
 def test_pixel():
     img = Image.open('1560221662.467294.png')
     img = ut.filter_color2(img, (0, 10))

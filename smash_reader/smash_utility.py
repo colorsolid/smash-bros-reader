@@ -445,11 +445,12 @@ def filter_game_data(game, mode):
     return simple_game
 
 
-def post_data(message='No message'):
-    URL = 'http://localhost:8000/reader_info/'
+def post_data(data={}):
+    key = open('key.txt', 'r').read().splitlines()[0]
+    URL = 'http://localhost:8000/reader_post/'
     DATA = {
-        'secret_code': 't7q72Uo_0vs{NKRmH=3g3apvsf3zoW!8,b6]nj)',
-        'data': message
+        'API_KEY': key,
+        'data': data
     }
     try:
         r = requests.post(url=URL, json=DATA)
