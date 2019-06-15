@@ -417,10 +417,24 @@ def ocr_test():
     cv2.waitKey(0)
 
 
+def game_color():
+    game = smash_game.Game()
+    game.player_count = 4
+    img = Image.open(os.path.join('captures', '0001.3.FIGHT_START.png'))
+    for edge in ut.COORDS['GAME']['PLAYER']['INFO'][game.player_count]:
+        color_coords = list(ut.COORDS['GAME']['PLAYER']['COLOR'])
+        color_coords[0] = edge - color_coords[0]
+        color_coords[2] = edge - color_coords[2]
+        crop = img.crop(color_coords)
+        print(ut.match_color(pixel=crop, mode='GAME'))
+
+
+
 if __name__ == '__main__':
     #ocr_test()
     #fight_tester()
     #test_game_data()
     #test_stencil()
-    test_pixel()
+    #fight_tester()
+    game_color()
     pass

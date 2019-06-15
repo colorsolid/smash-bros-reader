@@ -91,6 +91,27 @@ COORDS = {
     }
 }
 
+COLORS = {
+    'CARDS':{
+        'RED': (250, 52, 52),
+        'BLUE': (43, 137, 253),
+        'YELLOW': (248, 182, 16),
+        'GREEN': (35, 179, 73)
+    },
+    'GAME': {
+        'RED': (255, 42, 40),
+        'BLUE': (31, 141 ,255),
+        'YELLOW': (255, 203, 0),
+        'GREEN': (22, 193, 64)
+    },
+    'RESULTS': {
+        'RED': (240, 159, 163),
+        'BLUE': (125, 206, 254),
+        'YELLOW': (255, 244, 89),
+        'GREEN': (141, 212, 114)
+    }
+}
+
 folders = [f for f in os.listdir(TEMPLATES_DIR) if os.path.isdir(os.path.join(TEMPLATES_DIR, f))]
 TEMPLATES = {f.upper():{} for f in folders}
 for root, dirs, files in os.walk(TEMPLATES_DIR, topdown=False):
@@ -102,6 +123,36 @@ for root, dirs, files in os.walk(TEMPLATES_DIR, topdown=False):
             TEMPLATES[_type][name] = Image.open(path)
         else:
             TEMPLATES[_type] = {name: Image.open(path)}
+
+
+def save_settings(settings):
+    lines = [f'{k}={v}' for k, v in settings.items()]
+    open('settings.txt', 'w+').write('\n'.join(lines))
+
+
+def load_settings():
+    path = os.path.join(BASE_DIR, 'settings.txt')
+    if os.path.isfile(path):
+        lines = open(path, 'r').read().splitlines()
+        settings = {}
+        for line in lines:
+            k, v = line.split('=')
+            settings[k] = v
+    else:
+        key_path = os.path.join(BASE_DIR, 'key.txt')
+        key = ''
+        if os.path.isfile(key_path):
+            key = open(key_path, 'r').read().splitlines()[0]
+            os.remove(key_path)
+        settings = {
+            'API_KEY': key,
+            'POST_URL': 'https://www.smashbet.net/reader_post/'
+        }
+        save_settings(settings)
+    return settings
+
+
+SETTINGS = load_settings()
 
 
 #####################################################################
@@ -295,20 +346,6 @@ def avg_sim(sample, template, true_color=False):
     return avg
 
 
-COLORS = {
-    'CARDS':{
-        'RED': (250, 52, 52),
-        'BLUE': (43, 137, 253),
-        'YELLOW': (248, 182, 16),
-        'GREEN': (35, 179, 73)
-    },
-    'RESULTS': {
-        'RED': (240, 159, 163),
-        'BLUE': (125, 206, 254),
-        'YELLOW': (255, 244, 89),
-        'GREEN': (141, 212, 114)
-    }
-}
 
 
 def match_color(pixel=None, arr=[], mode=None):
@@ -338,8 +375,6 @@ def stencil(crop):
     w_pil, w_arr = convert_to_bw(crop, 254, inv=False)
     b_pil, _ = convert_to_bw(crop, 1, inv=False)
     b_fil = b_pil.copy()
-    print(b_pil)
-    print(b_fil)
     fill_border(b_fil)
     b_arr = np.array(b_fil)
     result = []
@@ -446,8 +481,8 @@ def filter_game_data(game, mode):
 
 
 def post_data(data={}):
-    key = open('key.txt', 'r').read().splitlines()[0]
-    URL = 'http://localhost:8000/reader_post/'
+    key = SETTINGS['API_KEY']
+    URL = SETTINGS['POST_URL']
     DATA = {
         'API_KEY': key,
         'data': data
@@ -499,29 +534,6 @@ def load_game_data():
         except json.decoder.JSONDecodeError:
             pass
     return []
-
-
-def save_settings(settings):
-    print(settings)
-    path = os.path.join(BASE_DIR, 'settings.json')
-    with open(path, 'w+') as outfile:
-        json.dump(settings, outfile)
-
-
-def load_settings():
-    path = os.path.join(BASE_DIR, 'settings.json')
-    if os.path.isfile(path):
-        with open(path, 'r') as infile:
-            settings = json.load(infile)
-    else:
-        settings = {
-            'monitor_index': 1,
-            'game_output': True,
-            'watcher_output': True,
-            'utility_output': True
-        }
-        save_settings(settings)
-    return settings
 
 
 def send_command():

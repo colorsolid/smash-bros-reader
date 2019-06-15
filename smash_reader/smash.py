@@ -356,7 +356,6 @@ def headless():
     queue = Queue()
     watcher_queue = Queue()
     watcher = smash_watcher.Watcher(watcher_queue, queue)
-    # watcher.daemon = True
     watcher.start()
     _input = ''
     while _input not in ['stop', 'exit', 'quit']:
@@ -370,7 +369,6 @@ def headless():
 if __name__ == '__main__':
     print(f'\n\n{"*" * 40} {TITLE} {"*" * 40}')
     print(f'<<<{datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")}>>>')
-    # settings = ut.load_settings()
     if len(argv):
         if '-nogui' in argv:
             headless()

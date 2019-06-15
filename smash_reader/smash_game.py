@@ -90,7 +90,7 @@ class Player:
                     if _sim < 99:
                         num = 1
                         for _name in ut.TEMPLATES['CHARACTER_NAMES_DUMP']:
-                            print(name, _name)
+                            _print(name, _name)
                             if name in _name:
                                 num += 1
                         filename = f'{name}-{num}.png'
@@ -167,7 +167,7 @@ class Team:
 
 
 class Game:
-    def __init__(self, num):
+    def __init__(self, num=1):
         self.number = num
         self.mode = ''
         self.map = ''
@@ -255,10 +255,7 @@ class Game:
         time.sleep(1)
         screen = ut.capture_screen()
         if not self.team_mode and not self.cancelled:
-            try:
-                self.fix_colors(screen)
-            except:
-                _print('Error fixing colors')
+            self.fix_colors(screen)
         if self.mode == 'Stock':
             self.get_stock_templates(screen)
         elif self.mode == 'Time':
@@ -290,16 +287,17 @@ class Game:
 
 
     def fix_colors(self, screen):
-        colors = ['RED', 'BLUE', 'YELLOW', 'GREEN']
-        names = self.get_character_names_game(screen)
+        info = self.get_character_details_game(screen)
         players = [player for team in self.teams for player in team.players]
         self.teams = []
-        for i, name in enumerate(names):
+        print('Fixing colors:')
+        for i, character_info in enumerate(info):
+            name, color = character_info
             player = next((p for p in players if p.character_name == name), None)
-            team = Team(colors[i])
+            team = Team(color)
             team.add_player(player)
             self.teams.append(team)
-            print(f'{team.color} - {player.character_name}')
+            print(f'\t{team.color} - {player.character_name}')
 
 
     def get_character_templates_lobby(self, screen):
@@ -322,11 +320,16 @@ class Game:
             template.save(f'{time.time()}.png')
 
 
-    def get_character_names_game(self, screen):
-        names = []
+    def get_character_details_game(self, screen):
+        info = []
         rerun = True
         while rerun:
             for edge in ut.COORDS['GAME']['PLAYER']['INFO'][self.player_count]:
+                color_coords = list(ut.COORDS['GAME']['PLAYER']['COLOR'])
+                color_coords[0] = edge - color_coords[0]
+                color_coords[2] = edge - color_coords[2]
+                color_pixel = screen.crop(color_coords)
+                color, _ = ut.match_color(pixel=color_pixel, mode='GAME')
                 char_template_coords = list(ut.COORDS['GAME']['PLAYER']['NAME'])
                 char_template_coords[0] = edge - char_template_coords[0]
                 char_template_coords[2] = edge - char_template_coords[2]
@@ -338,19 +341,19 @@ class Game:
                     name = difflib.get_close_matches(name_as_read, CHARACTER_NAMES, n=1)
                     if len(name):
                         _print(f'{name_as_read.rjust(30)} --> {name}')
-                        names.append(name[0])
+                        info.append((name[0], color))
                     else:
                         trainer_names = ['squirtle', 'charizard', 'ivysaur']
                         name = difflib.get_close_matches(name_as_read, trainer_names, n=1)
                         if len(name):
-                            names.append('pokémon trainer')
+                            info.append(('pokémon trainer', color))
                         else:
                             _print(f'Can\'t read <{name_as_read}>')
                     # template.show()
                     # template.save(f'{time.time()}.png')
                 else:
                     _print(f'Can\'t read <{name_as_read}>')
-        return names
+        return info
 
 
     def wait_for_go(self):

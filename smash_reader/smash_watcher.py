@@ -208,6 +208,7 @@ class Watcher(threading.Thread):
             ),
             'mode': self.current_type_index
         }
+        print('data:', data)
         ut.post_data(data)
 
 
