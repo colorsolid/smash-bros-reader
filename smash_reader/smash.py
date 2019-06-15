@@ -338,6 +338,9 @@ def run_gui():
     root.geometry('540x550')
     window = Window(root, bg=BG[0])
 
+    if ut.SETTINGS['AUTO_START_WATCHER'].lower() == 'true':
+        window.watcher_frame.toggle_watcher()
+
     root.mainloop()
 
     if window.watcher.isAlive():

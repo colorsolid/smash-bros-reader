@@ -1,2 +1,3 @@
 API_KEY=4ODS5aDOELuZUmrHMgK-N6VMFxh1DkOW0fw9qBzlhWZWhyG_WwsnxsMLPtXBObQo!2MPZ7dwGIHGmNIzD2V
 POST_URL=http://localhost:8000/reader_post/
+AUTO_START_WATCHER=true

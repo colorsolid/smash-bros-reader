@@ -146,7 +146,8 @@ def load_settings():
             os.remove(key_path)
         settings = {
             'API_KEY': key,
-            'POST_URL': 'https://www.smashbet.net/reader_post/'
+            'POST_URL': 'https://www.smashbet.net/reader_post/',
+            'AUTO_START_WATCHER': 'true'
         }
         save_settings(settings)
     return settings
