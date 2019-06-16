@@ -469,11 +469,14 @@ def filter_game_data(game, mode):
         simple_game['team_mode'] = game['team_mode']
         simple_game['game_mode'] = game['mode']
         simple_game['cancelled'] = game['cancelled']
-    if mode == 3:
+    if mode == 2:
         if not game['team_mode']:
-            for team in game['teams']:
-                simple_game['players'] = simplify_players(game)
-            simple_game['start_time'] = -1
+            if game['colors_changed']:
+                for team in game['teams']:
+                    simple_game['players'] = simplify_players(game)
+                    simple_game['colors_changed'] = True
+    if mode == 3:
+        simple_game['start_time'] = -1
     if mode == 4:
         simple_game = {'end_time': -1}
     if mode == 5:

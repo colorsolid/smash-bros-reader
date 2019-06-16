@@ -126,7 +126,6 @@ class Watcher(threading.Thread):
 
 
     def lock(self, index):
-        print('lock')
         self.current_type_index = index - 1
         self.read_screen_data()
         self.locked = True
@@ -208,11 +207,11 @@ class Watcher(threading.Thread):
             ),
             'mode': self.current_type_index
         }
-        print('data:', data)
         ut.post_data(data)
 
 
     def read_screen_data(self):
+        qp = lambda: self.filter_and_post(self.game.serialize(images_bool=False))
         # Flags
         if self.current_type_index == 0:
             self.gui_queue.put('update')
@@ -225,32 +224,33 @@ class Watcher(threading.Thread):
             time.sleep(1)
             self.cap = ut.capture_screen()
             self.game.read_card_screen(self.cap)
-            self.filter_and_post(self.game.serialize(images_bool=False))
+            qp()
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle pregame'})
         # Pregame
         if self.current_type_index == 2:
             _print('Battle pregame detected')
             self.game.read_start_screen(self.cap)
+            qp()
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle start'})
         # Game started
         if self.current_type_index == 3:
             _print('Battle start detected')
-            self.filter_and_post(self.game.serialize(images_bool=False))
+            qp()
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle end'})
         # Game ended
         if self.current_type_index == 4:
             _print('Battle end detected')
-            self.filter_and_post(self.game.serialize(images_bool=False))
+            qp()
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for battle results'})
         # Results
         if self.current_type_index == 5:
             _print('Battle results detected')
             self.game.read_results_screen(self.cap)
-            self.filter_and_post(self.game.serialize(images_bool=False))
+            qp()
             self.gui_queue.put('update')
             self.gui_queue.put({'status': 'Watching for flag screen'})
             # ut.save_game_data(self.game.serialize())

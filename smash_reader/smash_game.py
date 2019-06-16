@@ -178,7 +178,7 @@ class Game:
         self.start_time = 0
         self.duration = 0
         self.cancelled = False
-        self.colors_correct = False
+        self.colors_changed = False
 
 
     def serialize(self, images_bool=True):
@@ -245,7 +245,6 @@ class Game:
                 skip = 340
         if len(self.teams) == 2 and self.player_count > 2:
             self.team_mode = True
-            self.colors_correct = True
         elif len(set(players)) < len(players):
             _print('GAME CANCELLED DUE TO DUPLICATE CHARACTER IN FFA')
             self.cancelled = True
@@ -255,9 +254,10 @@ class Game:
         time.sleep(1)
         screen = ut.capture_screen()
         if not self.team_mode and not self.cancelled:
-            self.fix_colors(screen)
+            self.colors_changed = self.fix_colors(screen)
         if self.mode == 'Stock':
-            self.get_stock_templates(screen)
+            # self.get_stock_templates(screen)
+            pass
         elif self.mode == 'Time':
             pass
         elif self.mode == 'Stamina':
@@ -289,15 +289,24 @@ class Game:
     def fix_colors(self, screen):
         info = self.get_character_details_game(screen)
         players = [player for team in self.teams for player in team.players]
-        self.teams = []
-        print('Fixing colors:')
+        _players = copy.copy(players)
+        _teams = []
+        _print('Fixing colors:')
         for i, character_info in enumerate(info):
             name, color = character_info
             player = next((p for p in players if p.character_name == name), None)
             team = Team(color)
             team.add_player(player)
-            self.teams.append(team)
-            print(f'\t{team.color} - {player.character_name}')
+            _teams.append(team)
+            _print(f'\t{team.color} - {player.character_name}')
+        for team in self.teams:
+            color = team.color
+            character_name = team.players[0].character_name
+            _team = next((t for t in _teams if t.color == color))
+            if _team.players[0].character_name != character_name:
+                self.teams = _teams
+                return True
+        return False
 
 
     def get_character_templates_lobby(self, screen):
