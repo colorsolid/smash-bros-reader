@@ -455,6 +455,8 @@ def simplify_players(game):
             for key in keys:
                 if not player[key]:
                     del player[key]
+            if 'character_name' in player:
+                player['character_name'] = player['character_name'].title()
             player['color'] = color
             players.append(player)
     return players
