@@ -464,7 +464,7 @@ def simplify_players(game):
 
 
 def filter_game_data(game, mode):
-    simple_game = {}
+    simple_game = {'reader_mode': mode}
     if mode == 1:
         simple_game['players'] = simplify_players(game)
         simple_game['map'] = game['map']
@@ -480,9 +480,9 @@ def filter_game_data(game, mode):
     if mode == 3:
         simple_game['start_time'] = -1
     if mode == 4:
-        simple_game = {'end_time': -1}
+        simple_game['end_time'] = -1
     if mode == 5:
-        simple_game = {'winning_team': game['winning_color']}
+        simple_game['winning_team'] = game['winning_color']
     return simple_game
 
 
