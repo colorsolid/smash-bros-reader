@@ -33,6 +33,16 @@ CHARACTER_NAMES = [name.lower() for name in CHARACTER_NAMES]
 
 BASE_DIR = os.path.realpath(os.path.dirname(__file__))
 
+CHARACTER_NAME_FIXES = {
+    'lemmy': 'lenny',
+    'lemmv': 'lenny'
+}
+
+MAP_NAME_FIXES = {
+    'Figure-S': 'Figure-8',
+    'HiII': 'Hill'
+}
+
 
 class ImageProcessor(threading.Thread):
     def __init__(self):
@@ -82,6 +92,8 @@ class Player:
             self.character_name = re.match('(.+)(-\d*)', template_name).group(1)
         else:
             name_as_read = ut.read_image(pil).lower()
+            if name_as_read in CHARACTER_NAME_FIXES:
+                name_as_read = CHARACTER_NAME_FIXES[name_as_read]
             name = difflib.get_close_matches(name_as_read, CHARACTER_NAMES, n=1)
             if len(name):
                 name = name[0]
@@ -204,6 +216,9 @@ class Game:
         splits = text.split(' / ')
         self.mode = splits[0]
         self.map = splits[1]
+        for map_str in MAP_NAME_FIXES:
+            if map_str in self.map:
+                self.map.replace(map_str, MAP_NAME_FIXES[map_str])
 
     @ut.time_this
     def read_cards(self, screen):
@@ -347,6 +362,8 @@ class Game:
                 name_as_read = ut.read_image(bw).lower()
                 if name_as_read:
                     rerun = False
+                    if name_as_read in CHARACTER_NAME_FIXES:
+                        name_as_read = CHARACTER_NAME_FIXES[name_as_read]
                     name = difflib.get_close_matches(name_as_read, CHARACTER_NAMES, n=1)
                     if len(name):
                         _print(f'{name_as_read.rjust(30)} --> {name}')
