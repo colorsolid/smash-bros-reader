@@ -189,7 +189,7 @@ class Game:
         self.winning_color = ''
         self.start_time = 0
         self.duration = 0
-        self.cancelled = False
+        self.cancelled = ''
         self.colors_changed = False
 
 
@@ -246,7 +246,8 @@ class Game:
                 player.read_card(crop)
                 if player.character_name == '...':
                     _print('GAME CANCELLED DUE TO UNREADABLE CHARACTER NAME')
-                    self.cancelled = True
+                    self.cancelled = 'UNREADABLE_CHARACTER_NAME'
+                    ut.send_command('b')
                 else:
                     players.append(player.character_name)
                 self.player_count += 1
@@ -262,7 +263,8 @@ class Game:
             self.team_mode = True
         elif len(set(players)) < len(players):
             _print('GAME CANCELLED DUE TO DUPLICATE CHARACTER IN FFA')
-            self.cancelled = True
+            self.cancelled = 'DUPLICATE_CHARACTER'
+            ut.send_command('b')
 
 
     def read_start_screen(self, screen):

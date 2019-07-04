@@ -69,6 +69,7 @@ class Menubar(tk.Menu):
         self.debug_menu.add_separator()
         self.debug_menu.add_command(label='Capture cards_id template', command=ut.capture_cards_id)
         self.debug_menu.add_command(label='Character name debugging', command=self.master.character_name_debugging)
+        self.debug_menu.add_command(label='Click spectate', command=self.master.click_spectate)
 
         self.add_cascade(label='File', menu=self.file_menu)
         self.add_cascade(label='Debug', menu=self.debug_menu)
@@ -331,6 +332,10 @@ class Window(tk.Frame):
             self.watcher.unlock()
             smash_game.character_name_debugging_enabled = False
         self.character_name_debugging_enabled = not self.character_name_debugging_enabled
+
+
+    def click_spectate(self):
+        self.watcher.game.cancelled = 'DEBUG'
 
 
 def run_gui():

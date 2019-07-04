@@ -88,6 +88,10 @@ COORDS = {
         '2ND_PLACE_2_PLAYER': (690, 984, 691, 985),
         '3RD_PLACE': (1072, 1003, 1073, 1004),
         '4TH_PLACE': (1492, 1013, 1493, 1014)
+    },
+    'MENU': {
+        'FAILED_TO_PLAY_REPLAY': (724, 408, 1185, 485),
+        'SPECTATE_SELECTED': (979, 458, 1586, 606)
     }
 }
 
@@ -260,6 +264,7 @@ def convert_to_bw(pil_img, threshold=127, inv=True):
             method = cv2.THRESH_BINARY
         thresh, array_bw = cv2.threshold(img_gray, threshold, 255, method)
         pil_bw = Image.fromarray(array_bw)
+
         return pil_bw, array_bw
     except cv2.error:
         return pil_img, cv_img
@@ -343,8 +348,6 @@ def avg_sim(sample, template, true_color=False):
     sims = [comp_func(sample, template, true_color) for comp_func in comp_funcs]
     avg = sum(sims) / len(sims)
     return avg
-
-
 
 
 def match_color(pixel=None, arr=[], mode=None):
@@ -540,10 +543,9 @@ def load_game_data():
     return []
 
 
-def send_command():
-    # subprocess.Popen()
-    # PIGPIO_ADDR=169.254.183.202
-    pass
+def send_command(btn):
+    _print('PRESS', btn)
+    os.system(f'PIGPIO_ADDR=raspberrypi.local python3 /home/badgerlord/Desktop/{btn}.py')
 
 
 def random_str(l=10):
