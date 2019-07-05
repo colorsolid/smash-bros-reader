@@ -150,7 +150,7 @@ class Watcher(threading.Thread):
             self.check_queue()
             crop = cap.crop(ut.COORDS['MENU']['SPECTATE_SELECTED'])
             if ut.avg_sim(crop, template) > 95:
-                time.sleep(1)
+                time.sleep(5)
                 ut.send_command('a')
                 break
             time.sleep(0.1)
