@@ -154,7 +154,8 @@ class Watcher(threading.Thread):
                 time.sleep(5)
                 ut.send_command('a')
                 break
-            time.sleep(0.1)
+            time.sleep(5)
+            ut.send_command('a')
 
 
     # @ut.pad_time(0.20)
