@@ -319,8 +319,8 @@ class Game:
         for team in self.teams:
             color = team.color
             character_name = team.players[0].character_name
-            _team = next((t for t in _teams if t.color == color))
-            if _team.players[0].character_name != character_name:
+            _team = next((t for t in _teams if t.color == color), None)
+            if not _team or _team.players[0].character_name != character_name:
                 self.teams = _teams
                 return True
         return False
