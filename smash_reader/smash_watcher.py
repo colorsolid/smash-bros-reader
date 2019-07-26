@@ -69,8 +69,8 @@ class Watcher(threading.Thread):
             crop = self.cap.crop(ut.COORDS['MENU']['FAILED_TO_PLAY_REPLAY'])
             if ut.avg_sim(crop, ut.TEMPLATES['MENU']['FAILED_TO_PLAY_REPLAY']) >= 95:
                 self.game.cancelled = 'REPLAY_FAILED'
-                time.sleep(5)
                 ut.send_command('a')
+                time.sleep(2)
             if self.game.cancelled:
                 self.reset()
                 if not self.locked:
@@ -145,14 +145,20 @@ class Watcher(threading.Thread):
 
 
     def watch_for_menu(self):
-        template = ut.TEMPLATES['MENU']['SPECTATE_SELECTED']
+        templates = [
+            ut.TEMPLATES['MENU']['SPECTATE_SELECTED'],
+            ut.TEMPLATES['LOBBBY']['FLAGS_ID']
+        ]
         while self.cont:
             cap = ut.capture_screen()
             self.check_queue()
             crop = cap.crop(ut.COORDS['MENU']['SPECTATE_SELECTED'])
-            if ut.avg_sim(crop, template) > 95:
+            if ut.avg_sim(crop, templates[0]) > 95:
                 time.sleep(5)
                 ut.send_command('a')
+                break
+            crop = cap.crop(ut.COORDS['LOBBY']['FLAGS_ID'])
+            if ut.avg_sim(crop, templates[1] > 95):
                 break
             ut.send_command('a')
             time.sleep(2)
