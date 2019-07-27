@@ -147,7 +147,7 @@ class Watcher(threading.Thread):
     def watch_for_menu(self):
         templates = [
             ut.TEMPLATES['MENU']['SPECTATE_SELECTED'],
-            ut.TEMPLATES['LOBBBY']['FLAGS_ID']
+            ut.TEMPLATES['LOBBY']['FLAGS_ID']
         ]
         while self.cont:
             cap = ut.capture_screen()
