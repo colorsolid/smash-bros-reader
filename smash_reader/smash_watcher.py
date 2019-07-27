@@ -69,8 +69,8 @@ class Watcher(threading.Thread):
             crop = self.cap.crop(ut.COORDS['MENU']['FAILED_TO_PLAY_REPLAY'])
             if ut.avg_sim(crop, ut.TEMPLATES['MENU']['FAILED_TO_PLAY_REPLAY']) >= 95:
                 self.game.cancelled = 'REPLAY_FAILED'
+                time.sleep(5)
                 ut.send_command('a')
-                time.sleep(2)
             if self.game.cancelled:
                 self.reset()
                 if not self.locked:
