@@ -158,7 +158,7 @@ class Watcher(threading.Thread):
                 ut.send_command('a')
                 break
             crop = cap.crop(ut.COORDS['LOBBY']['FLAGS_ID'])
-            if ut.avg_sim(crop, templates[1] > 95):
+            if ut.avg_sim(crop, templates[1]) > 95:
                 break
             ut.send_command('a')
             time.sleep(2)
