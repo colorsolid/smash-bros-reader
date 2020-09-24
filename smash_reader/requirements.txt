@@ -11,7 +11,7 @@ mss==4.0.2
 networkx==2.3
 numpy==1.16.3
 opencv-python==4.1.0.25
-Pillow==6.0.0
+Pillow>=7.1.0
 psycopg2==2.8.2
 pynput==1.4.2
 pyparsing==2.4.0
