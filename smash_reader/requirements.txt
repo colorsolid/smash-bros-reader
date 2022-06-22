@@ -9,7 +9,7 @@ kiwisolver==1.1.0
 matplotlib==3.0.3
 mss==4.0.2
 networkx==2.3
-numpy==1.21.0
+numpy==1.22.0
 opencv-python==4.2.0.32
 Pillow>=7.1.0
 psycopg2==2.8.2
